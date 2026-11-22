@@ -1,0 +1,30 @@
+diff --git a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
+--- a/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
++++ b/node_modules/react-native-safe-area-context/android/src/main/jni/CMakeLists.txt
+@@ -9,8 +9,14 @@ set(LIB_COMMON_DIR ${LIB_ANDROID_DIR}/../common/cpp)
+ set(LIB_ANDROID_GENERATED_JNI_DIR ${LIB_ANDROID_DIR}/build/generated/source/codegen/jni)
+ set(LIB_ANDROID_GENERATED_COMPONENTS_DIR ${LIB_ANDROID_GENERATED_JNI_DIR}/react/renderer/components/${LIB_LITERAL})
+ 
+-file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS *.cpp ${LIB_COMMON_DIR}/react/renderer/components/${LIB_LITERAL}/*.cpp)
+-file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${LIB_ANDROID_GENERATED_JNI_DIR}/*.cpp ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}/*.cpp)
++set(COMMON_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/common_src")
++set(CODEGEN_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/codegen_src")
++
++file(COPY "${LIB_COMMON_DIR}/" DESTINATION "${COMMON_SRC_DIR}")
++file(COPY "${LIB_ANDROID_GENERATED_JNI_DIR}/" DESTINATION "${CODEGEN_SRC_DIR}")
++
++file(GLOB LIB_CUSTOM_SRCS CONFIGURE_DEPENDS *.cpp ${COMMON_SRC_DIR}/react/renderer/components/${LIB_LITERAL}/*.cpp)
++file(GLOB LIB_CODEGEN_SRCS CONFIGURE_DEPENDS ${CODEGEN_SRC_DIR}/*.cpp ${CODEGEN_SRC_DIR}/react/renderer/components/${LIB_LITERAL}/*.cpp)
+ 
+ add_library(
+   ${LIB_TARGET_NAME}
+@@ -23,6 +29,9 @@ target_include_directories(
+   ${LIB_TARGET_NAME}
+   PUBLIC
+   .
++  ${COMMON_SRC_DIR}
++  ${CODEGEN_SRC_DIR}
++  ${CODEGEN_SRC_DIR}/react/renderer/components/${LIB_LITERAL}
+   ${LIB_COMMON_DIR}
+   ${LIB_ANDROID_GENERATED_JNI_DIR}
+   ${LIB_ANDROID_GENERATED_COMPONENTS_DIR}

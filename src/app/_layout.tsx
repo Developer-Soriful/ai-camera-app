@@ -1,18 +1,40 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useColorScheme } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { Stack } from 'expo-router';
+import { AdjustmentProvider } from '../features/editor/context/AdjustmentContext';
+import { ToastPill } from '../ui/primitives/ToastPill';
+import { useCameraSessionStore } from '../features/camera/store/useCameraSessionStore';
+import { colors } from '../ui/theme/tokens';
 
-import { AnimatedSplashOverlay } from '@/components/animated-icon';
-import AppTabs from '@/components/app-tabs';
+export default function RootLayout() {
+  const toastMessage = useCameraSessionStore((s) => s.toastMessage);
+  const clearToast = useCameraSessionStore((s) => s.clearToast);
 
-SplashScreen.preventAutoHideAsync();
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <AnimatedSplashOverlay />
-      <AppTabs />
-    </ThemeProvider>
+    <GestureHandlerRootView style={styles.root}>
+      <SafeAreaProvider>
+        <StatusBar style="light" translucent backgroundColor="transparent" />
+        <AdjustmentProvider>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: 'fade',
+              contentStyle: { backgroundColor: colors.canvas },
+            }}
+          />
+          <ToastPill message={toastMessage} onDismiss={clearToast} />
+        </AdjustmentProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: colors.canvas,
+  },
+});
